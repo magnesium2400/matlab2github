@@ -14,7 +14,7 @@ function outputfull = m2md(file, varargin)
 % derived from markdown and GitHub Flavored Markdown. For example, use asterisks
 % for *bold* (`*bold*`) text (MATLAB); underscores for _italic_ (`_italic_`)
 % text (MATLAB); 1 or 2 dollar signs for inline or block equations like $e^{i
-% \pi} + 1 = 0$ (``$ e^{i \pi} + 1 = 0 $``); two spaces at the start of a line for
+% \pi} + 1 = 0$ ($ e^{i \pi} + 1 = 0 $); two spaces at the start of a line for
 % sample code (MATLAB); three spaces at the start of a line for executable code
 % (MATLAB); asterisks and numbers for lists (MATLAB and markdown); backticks for
 % `inline code` (markdown).
@@ -101,6 +101,7 @@ ip.addParameter('changeMonospace', true, @islogical);
 ip.addParameter('changeTitle', true, @islogical);
 ip.addParameter('changeHeading', true, @islogical);
 ip.addParameter('deleteMlx', true, @islogical);
+ip.addParameter('mlxOptions', struct('HideCode', true, 'Run', false), @(x) isstruct(x) && numel(x) == 1);
 
 ip.parse(file, varargin{:});
 [~,name,ext]    = fileparts(ip.Results.file);
@@ -140,7 +141,7 @@ cleanupObj(1) = onCleanup(@() activeDoc.close()); % close .mlx window when compl
 activeDoc.saveAs(tmpName);
 if ip.Results.deleteMlx; cleanupObj(2) = onCleanup(@() delete(tmpName)); end
 
-export(activeDoc.Filename, outputfull, 'HideCode', true, 'Run', false); % activeDoc.close(); % delete(tmpName);
+export(activeDoc.Filename, outputfull, ip.Results.mlxOptions); % activeDoc.close(); % delete(tmpName);
 
 
 %% Post-translational modifications

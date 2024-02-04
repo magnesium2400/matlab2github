@@ -1,3 +1,8 @@
+---
+layout: default
+title: m2md
+---
+
 
 # m2md Convert MATLAB .m docstring/help to Markdown
 # Syntax
@@ -10,7 +15,7 @@ outputFilepath = m2md(file,___)
 ```
 # Usage Notes
 
-This function converts the "docstring" (the first comment in the `.m` file) into (GitHub® Flavored) Markdown. This function combines the functionality of MATLAB®'s inbuilt PUBLISH and EXPORT functions, as well as some syntax derived from markdown and GitHub Flavored Markdown. For example, use asterisks for **bold** (`*bold*`) text (MATLAB); underscores for *italic* (`_italic_`) text (MATLAB); 1 or 2 dollar signs for inline or block equations like $e^{i\pi } +1=0$ (``\$ e^{i \\pi} + 1 = 0 \$``); two spaces at the start of a line for sample code (MATLAB); three spaces at the start of a line for executable code (MATLAB); asterisks and numbers for lists (MATLAB and markdown); backticks for `inline code` (markdown).
+This function converts the "docstring" (the first comment in the `.m` file) into (GitHub® Flavored) Markdown. This function combines the functionality of MATLAB®'s inbuilt PUBLISH and EXPORT functions, as well as some syntax derived from markdown and GitHub Flavored Markdown. For example, use asterisks for **bold** (`*bold*`) text (MATLAB); underscores for *italic* (`_italic_`) text (MATLAB); 1 or 2 dollar signs for inline or block equations like $e^{i\pi } +1=0$ (\$ e^{i \\pi} + 1 = 0 \$); two spaces at the start of a line for sample code (MATLAB); three spaces at the start of a line for executable code (MATLAB); asterisks and numbers for lists (MATLAB and markdown); backticks for `inline code` (markdown).
 
 
 See here for more information:
