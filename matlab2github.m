@@ -1,16 +1,29 @@
-function [f, ms, d] = matlab2github(varargin)
+function matlab2github(varargin)
 %% MATLAB2GITHUB Generates Markdown files for specified directory in docs folder
+%% Examples
+%   matlab2github
+%   matlab2github(pwd)
+%   matlab2github('this_folder')
+%   matlab2github(pwd, 'outputdir', 'help')
+%
+%
+%% Usage Notes
+% * Only one level of nesting is supported
+%
+%
+%% TODO
+% * docs
+% * check recursion/multiple depths through folder structure
+% * add functionality for contents incl MAKECONTENTSFILE
+% * add functionality to only redo conversion for changed files (perhaps by storing .m file checksum in .md file frontmatter)
+%
+%
 %% Authors
 % Mehul Gajwani, Monash University, 2024
-% 
-% 
-%% TODO 
-% * docs
-% * recursion/multiple depths through folder structure
 %
 %
 %% See also
-% m2md
+% EXPORT, PUBLISH, DOC, HELP, LOOKFOR, MAKECONTENTSFILE, mlx2md, m2md
 %
 %
 
@@ -24,10 +37,13 @@ addParameter(ip, 'useSections', true, @islogical);
 ip.parse(varargin{:});
 f = fullfile(ip.Results.folder);
 outputdir = ip.Results.outputdir;
+if ~isfolder(outputdir); mkdir(outputdir); end
+
 
 %% Iterate over folder, create md files in ./docs
-
-ms = dir(fullfile(f, '**\*.m')); %% all m files in f, recursively
+% all m files in f recursively, and remove private
+ms = dir(fullfile(f, '**\*.m'));
+ms = ms(cellfun(@(x) isempty(x), (regexp({ms.folder}.', ['private(\', filesep, '|$)'],'dotexceptnewline'))));
 d = dir(f);
 p = d(1).folder;
 l = strlength(p);
@@ -35,43 +51,41 @@ l = strlength(p);
 for ii = 1:length(ms)
 
     s = ms(ii).folder;
-    s = s((l+2):end);
+    s = s( (l+2):end );
     of = fullfile(outputdir, s);
     n = ms(ii).name;
     n = n(1:(end-2));
 
-    try
-        mdFile = m2md( fullfile(ms(ii).folder, ms(ii).name) , 'outputdir', outputdir);
+    fprintf("%i/%i: %s", ii, length(ms), n);
+
+    try % continue to all files even if some errors occur
+        mdFile = m2md( fullfile(ms(ii).folder, ms(ii).name) , ...
+            'outputdir', of, 'addFrontmatter', false);
 
         yaml = struct('layout', 'default', 'title', n);
-        if isempty(s); writeFrontmatter(mdFile, yaml); continue; end
-        
+        if isempty(s); writeFrontmatter(mdFile, yaml); fprintf(' done\n'); continue; end
+
         yaml.parent = s;
         writeFrontmatter(mdFile, yaml);
-        
+
         % Create parent file in each directory if needed
         indexFile = fullfile(of, strcat(s,'.md'));
-        if ~exist(indexFile, 'file')
-            f = fopen(fullfile(of, strcat(s,'.md')), 'wt');
+        if ~isfile(indexFile)
+            f = fopen(mdFile, 'r');
             fclose(f);
             writeFrontmatter(indexFile, struct('layout', 'default', 'title', s, 'has_children', 'true'));
         else
             writeFrontmatter(indexFile, struct('has_children', 'true'));
         end
 
-        fprintf("%i/%i\n", ii, length(ms));
-
+        fprintf(' done\n');
 
     catch ME
-        disp("error: " + n);
+        fprintf(" error:\n");
         disp(ME)
     end
 
 end
-
-
-%
-
 
 
 

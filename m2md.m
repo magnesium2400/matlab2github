@@ -24,8 +24,8 @@ function outputfull = m2md(file, varargin)
 % * <https://mathworks.com/help/matlab/matlab_prog/marking-up-matlab-comments-for-publishing.html>
 % * <https://mathworks.com/help/matlab/matlab_prog/publishing-matlab-code.html>
 % * <https://au.mathworks.com/help/matlab/matlab_prog/format-live-scripts.html>
-% 
-% 
+%
+%
 %% Description
 % `m2md(file)` generates a markdown file from the "docstring" (first contiguous
 % comment block) of the specified MATLAB file. `m2md` saves the markdown file
@@ -68,12 +68,16 @@ function outputfull = m2md(file, varargin)
 % (default) | false)`
 % 
 % 
-% `changeCode - Whether to replace HTML <samp> tags from code (true (default) |
+% `changeCode - Whether to replace HTML samp tags from code (true (default) |
 % false)`
 % 
 % 
-% `changeMonospace - Whether to replace HTML <pre> tags from code (true
+% `changeMonospace - Whether to replace HTML pre tags from code (true
 % (default) | false)`
+% 
+% 
+% `addFrontmatter - Whether to add YAML-style frontmatter (true (default) |
+% false)`
 % 
 % 
 %% Output Arguments
@@ -85,7 +89,7 @@ function outputfull = m2md(file, varargin)
 % 
 % 
 %% See also 
-% EXPORT, PUBLISH, DOC, HELP, LOOKFOR, MAKECONTENTSFILE
+% EXPORT, PUBLISH, DOC, HELP, LOOKFOR, MAKECONTENTSFILE, mlx2md, matlab2github
 % 
 % 
 
@@ -100,6 +104,8 @@ ip.addParameter('changeCode', true, @islogical);
 ip.addParameter('changeMonospace', true, @islogical);
 ip.addParameter('changeTitle', true, @islogical);
 ip.addParameter('changeHeading', true, @islogical);
+ip.addParameter('addFrontmatter', true, @islogical);
+
 ip.addParameter('deleteMlx', true, @islogical);
 ip.addParameter('mlxOptions', struct('HideCode', true, 'Run', false), @(x) isstruct(x) && numel(x) == 1);
 
@@ -108,7 +114,7 @@ ip.parse(file, varargin{:});
 outputdir       = ip.Results.outputdir;
 outputfile      = ip.Results.outputfile;
 
-assert(exist(file, 'file'), "File does not exist");
+assert(isfile(file), "File does not exist");
 assert(strcmp(ext, '.m'), "Input file must be .m file");
 
 
@@ -119,14 +125,14 @@ tmpName = [tempname(filepath), '.mlx'];
 
 if isempty(outputdir); outputdir = filepath; end
 if isempty(outputfile); outputfile = [name, '.md']; end
-if ~exist(outputdir, 'dir'); mkdir(outputdir); end
+if ~isfolder(outputdir); mkdir(outputdir); end
 outputfull = fullfile(outputdir, outputfile);
 
 
 %% Parse text from first comment
-filetext = split(fileread(file), newline);
+filetext = readlines(file);
 
-commented = isLineCommented(filetext);
+commented = cellfun(@(x) ~isempty(x) && ~isempty(regexp(x, '^\s*%', 'once')), filetext);
 commentStart = find(commented, 1);
 commentEnd = find(~commented(commentStart:end),1)+commentStart-2;
 
@@ -148,6 +154,7 @@ export(activeDoc.Filename, outputfull, ip.Results.mlxOptions); % activeDoc.close
 % TODO : make sure the html tags are in plaintext environment
 out = readlines(outputfull);    
 rep = @(d,x,y) cellfun(@(a) strrep(a, x, y), d, 'UniformOutput', false);
+
 if ip.Results.changeCode
     out = rep(out,'<samp>', '`');
     out = rep(out,'</samp>', '`');
@@ -161,19 +168,33 @@ if ip.Results.changeTitle
     out = rep(out,'</span>', '');
 end
 if ip.Results.changeHeading
-    out = rep(out,' %%', '#');
+    out = regexprep(out, '(?<=^#( %%)*)( %%)', '#'); % positive lookbehind
+    % out = rep(out,' %%', '#');
 end
+
+% add newline before each heading (works better with just-the-docs)
+headings = cellfun(@(x) ~isempty(regexp(x, '^( \t)*#', 'once')) && regexp(x, '( \t)*#+') == 1 , out);
+headings = cumsum(headings);
+tmp = repmat({' '}, (length(out)+headings(end)), 1);
+tmp((1:length(out)).' + headings) = out;
+out = tmp; clear tmp;
+
 writelines(out, outputfull);
+
+if ip.Results.addFrontmatter
+    writeFrontmatter(outputfull, struct('layout', 'default', 'title', name));
+end
+
 
 
 end % main
 
 
 %% Helpers
-function out = isLineCommented(stringCellArray)
-for ii = 1:length(stringCellArray)
-    l = strtrim(stringCellArray{ii});
-    out(ii) = strlength(l) && strcmp(l(1), '%'); %#ok<AGROW>
-end
-end
+% function out = isLineCommented(stringCellArray)
+% for ii = 1:length(stringCellArray)
+%     l = strtrim(stringCellArray{ii});
+%     out(ii) = strlength(l) && strcmp(l(1), '%'); %#ok<AGROW>
+% end
+% end
 

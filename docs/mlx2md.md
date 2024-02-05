@@ -4,141 +4,23 @@ title: mlx2md
 ---
 
 
-# m2md Convert MATLAB .m docstring/help to Markdown
-```matlab
-Detailed explanation goes here
-```
-# h1
-## h2
-### h3
-#### h4
-
-`example` text
-
- $$ math\times mathjax=\Pi $$ 
-
-Here is an inline equation: $moreMath+5^2 =\pi$ 
-
-
-`monospace?`
-
-
-data (vector | matrix | scalar) data (vector `matrix` scalar)
-
-
-`code`
-
-
-`code`
-
-
-`code`
-
-
-`code code code`
-
--  `code` 
--  `code` 
--  `code` 
-# heading one
-
-```matlab more code more code more code ```
-
-# heading 2
--  underscores for *italics* (`_italics_`) 
--  asterisks for **bold** (`*bold*`) 
--  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. 
--  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. 
-
-Note: this README was generated using `m2md` and uses syntax dependent on MATLAB®'s PUBLISH function. However, it **requires the addition of the keyphrase `%% ENDPUBLISH` after the help/docstring to function**. See the help for the PUBLISH function and the associated Topic pages for more information on styling. For example, start lines with 1 space to show regular text; 2 spaces for monospaced text; and 3 spaces for sample code. As much as possible, compatibility with both PUBLISH and HELP was maintained. This code is distributed as-is, but is accepting improvements (at least in 2023).
-
-# Syntax
-```matlab
-m2md(file)
-m2md
-m2md("m2md-this-directory")
-m2md([])
-m2md(file, Name, Value)
-mdFile = m2md(file,___)
-[mdFile,texFile] = m2md(file,___)
-```
-# Description
-
-`m2md(file)` converts the doctring or help of the specified MATLAB code file to a tex file and then into a Markdown file, using the functionality provided by PUBLISH and LATEX2MARKDOWN. It requires the addition of the keyphrase `%% ENDPUBLISH` after the help/docstring to function.
-
-
-`m2md` converts all the `.m` files in the current directory (not in its subdirectories) using default specifications, and outputs the `.tex` and `.md` files in `./html`. `Contents.m`, if it exists, is (by default) output in the current directory (but this can be overridden). If more than half of the .m files in the current directory have been converted to .md files and placed in a sub-directory, m2md will try to guess the default settings that have been used.
-
-
-`m2md("m2md-this-directory")` uses the keyphrase "m2md-this-directory" to iterate over the MATLAB `.m` code files in the current directory. It can be combined with Name-Value pairs, and in particular with `recursiveSearch`. `Contents.m`, if it exists, is (by default) output in the current directory (but this can be overridden).
-
+ 
+# m2md Convert MATLAB .mlx to Markdown
+ 
 # Examples
 ```matlab
-m2md("m2md");
-m2md("m2md", 'mdDir', '.', 'mdFilename', 'README', 'deleteTex', true);
-m2md([], 'mdDir', 'DOCS', 'deleteTex', true, 'recursiveSearch', false);
+addpath(genpath(fileparts(which('matlab2github')))); mlx2md(fullfile(fileparts(which('matlab2github')), 'data', 'dummy.mlx'));
 ```
-# Input Arguments
-```matlab
-file - MATLAB file name (character vector | string)
-MATLAB file name, specified as a character vector or string. It should *NOT*
-include the '.m' extension. *NOTE*: When publishing a file, this will
-overwrite existing files in the target folders with the same name as `file`.
-```
-# Name-Value Arguments
+ 
+# TODO
+-  docs 
+ 
+# Authors
 
-`texOptions - Options to pass through to PUBLISH (cell array)` Name-Value arguments to be passed through when calling PUBLISH. The default behaviour is to set the format to latex and turn off the display and evaluation of code. These can be changed if desired, but is likely to significantly harm performance. See the Name-Value Arguemnts of PUBLISH for more information.
+Mehul Gajwani, Monash University, 2024
 
+ 
+# See also
 
-`mdOptions - Options to pass through to LATEX2MARKDOWN (cell array)` Name-Value arguments to be passed through when calling LATEX2MARKDOWN. Note that there is currently **NO** option to turn off the Table of Contents - this is autogenerated by PUBLISH. See the Instructions/docs for LATEX2MARKDOWN / LIVESCRIPT2MARKDOWN for more information.
+m2md
 
-
-`outputDir - Directory to create the tex and md files (string | character vector)` Output folder to which the tex and md files are saved. If no folder is specified, these will be output to the default specified by PUBLISH, `./html`.
-
-
-***texDir*** - Directory to create the tex file only (string | character vector)
-
-```matlab
-Output folder to which the tex file only is saved.
-```
-
-***mdDir*** - Directory to create the md file only (string | character vector)
-
-```matlab
-Output folder to which the md file only is saved.
-```
-
-***mdFilename*** - Name of the md file (string OR character vector)
-
-```matlab
-Output file name to which the md file is saved.
-```
-
-***deleteTex*** - Flag to delete tex file (false (default) | true)
-
-```matlab
-Whether to delete the intermediary tex file, specified as `true` or `false`.
-If the tex file is deleted and its parent folder is empty, the parent folder
-will then be deleted too.
-```
-
-***recursiveSearch*** - Flag to seach subdirectories when using "m2md-this-directory" (false (default) | true)
-
-```matlab
-Whether to additionally search and create .md files for .m files located in
-the subdirectories of the present directory.
-```
-
-***contentsName*** - Filename to be used for Contents.m ('Contents' (default) | string | character vector)
-
-```matlab
-Filename used for Contents.m if using m2md("m2md-this-directory", ___) or
-m2md([], ___).
-```
-
-***contentsDir*** - Directory to be used for Contents.m ('.' (default) OR string OR character vector)
-
-```matlab
-Directory used for Contents.m if using `m2md("m2md-this-directory", ___)` or
-`m2md([], ___)`. aa
-```
