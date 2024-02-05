@@ -1,7 +1,7 @@
 ---
 layout: default
 title: m2md
-checksum: 272f7d9a633e9c224efa5e11b39575c9
+checksum: f61036cde136595eaf51d084fe98893b
 ---
 
 
@@ -78,7 +78,13 @@ m2md('m2md.m', 'outputdir', 'docs')
  
 # Output Arguments
 
-`outputFilepath - name of converted file (string scalar | character vector)`
+`outputFilepath - Name of converted file (string scalar | character vector)`
+
+
+`docstring - Raw text of docstring parsed from file (character vector)`
+
+
+`matched - Whether file was skipped because a match was found (logical)`
 
  
 # TODO

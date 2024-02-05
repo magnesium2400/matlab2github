@@ -59,15 +59,17 @@ for ii = 1:length(ms)
     fprintf("%i/%i: %s", ii, length(ms), n);
 
     try % continue to all files even if some errors occur
-        [mdFile, docstring] = m2md( fullfile(ms(ii).folder, ms(ii).name) , ...
+        [mdFile, docstring, matched] = ...
+            m2md( fullfile(ms(ii).folder, ms(ii).name) , ...
             'outputdir', of, 'addFrontmatter', false);
+        if matched; doneString = ' matched\n'; else; doneString = ' done\n'; end
 
         yaml = struct('layout', 'default', 'title', n, ...
             'checksum', mlreportgen.utils.hash(docstring));
         if isempty(s) && ~ip.Results.isNested
-            writeFrontmatter(mdFile, yaml); 
-            fprintf(' done\n'); 
-            continue; 
+            writeFrontmatter(mdFile, yaml);
+            fprintf(doneString);
+            continue;
         elseif isempty(s) && ip.Results.isNested
             [~,s] = fileparts(p);
         end
@@ -85,10 +87,10 @@ for ii = 1:length(ms)
             writeFrontmatter(indexFile, struct('has_children', 'true'));
         end
 
-        fprintf(' done\n');
+        fprintf(doneString);
 
     catch ME
-        fprintf(" error:\n");
+        fprintf(' error:\n');
         disp(ME)
     end
 

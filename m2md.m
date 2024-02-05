@@ -1,4 +1,4 @@
-function [outputfull, docstringText] = m2md(file, varargin)
+function [outputfull, docstringText, matched] = m2md(file, varargin)
 %% m2md Convert MATLAB .m docstring/help to Markdown
 %% Syntax
 %  m2md(file)
@@ -62,37 +62,34 @@ function [outputfull, docstringText] = m2md(file, varargin)
 % file_), and `skipMatchingChecksum` is set to `true`, a new markdown file will
 % not be generated. This speeds up re-running code on existing codebases.
 % 
-% 
 % `addFrontmatter - Whether to add YAML-style frontmatter (true (default) |
 % false)` This adds YAML-style frontmatter that may aid in the use of templates
 % when creating webpages using GitHub pages.
 % 
-% 
 % `outputdir - Name of directory of converted file (string scalar | character
 % vector)`
 % 
-% 
 % `outputfile - Name of converted file (string scalar | character vector)`
-% 
 % 
 % `changeTitle - Whether to remove color information from document title (true
 % (default) | false)`
 % 
-% 
 % `changeHeading - Whether to format headings with # instead of %% (true
 % (default) | false)`
 % 
-% 
 % `changeCode - Whether to replace HTML samp tags from code (true (default) |
 % false)`
-% 
 % 
 % `changeMonospace - Whether to replace HTML pre tags from code (true
 % (default) | false)`
 % 
 % 
 %% Output Arguments
-% `outputFilepath - name of converted file (string scalar | character vector)`
+% `outputFilepath - Name of converted file (string scalar | character vector)`
+% 
+% `docstring - Raw text of docstring parsed from file (character vector)`
+% 
+% `matched - Whether file was skipped because a match was found (logical)`
 % 
 % 
 %% TODO
@@ -161,9 +158,11 @@ if ip.Results.skipMatchingChecksum && isfile(outputfull)
     prev = readFrontmatter(outputfull);
     if isfield(prev, 'checksum') && ...
             strcmp(prev.checksum, mlreportgen.utils.hash(docstringText))
+        matched = true;
         return;
     end
 end
+matched = false;
 
 
 %% Convert to mlx, open, export, close, and delete
