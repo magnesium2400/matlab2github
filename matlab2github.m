@@ -32,6 +32,7 @@ addOptional(ip, 'folder', pwd, @(x) isStringScalar(x) || ischar(x));
 addParameter(ip, 'outputdir', 'docs', @(x) isStringScalar(x) || ischar(x));
 addParameter(ip, 'addFrontmatter', true, @islogical);
 addParameter(ip, 'useSections', true, @islogical);
+addParameter(ip, 'isNested', false, @islogical);
 
 ip.parse(varargin{:});
 f = fullfile(ip.Results.folder);
@@ -51,7 +52,7 @@ for ii = 1:length(ms)
 
     s = ms(ii).folder;
     s = s( (l+2):end );
-    of = fullfile(outputdir, s);
+    of = fullfile(outputdir, s); % outputfile
     n = ms(ii).name;
     n = n(1:(end-2));
 
@@ -63,7 +64,13 @@ for ii = 1:length(ms)
 
         yaml = struct('layout', 'default', 'title', n, ...
             'checksum', mlreportgen.utils.hash(docstring));
-        if isempty(s); writeFrontmatter(mdFile, yaml); fprintf(' done\n'); continue; end
+        if isempty(s) && ~ip.Results.isNested
+            writeFrontmatter(mdFile, yaml); 
+            fprintf(' done\n'); 
+            continue; 
+        elseif isempty(s) && ip.Results.isNested
+            [~,s] = fileparts(p);
+        end
 
         yaml.parent = s;
         writeFrontmatter(mdFile, yaml);

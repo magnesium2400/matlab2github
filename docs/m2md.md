@@ -1,7 +1,7 @@
 ---
 layout: default
 title: m2md
-checksum: a0cf176981e6f17aac58b10c913a66ef
+checksum: 272f7d9a633e9c224efa5e11b39575c9
 ---
 
 
@@ -80,6 +80,9 @@ m2md('m2md.m', 'outputdir', 'docs')
 
 `outputFilepath - name of converted file (string scalar | character vector)`
 
+ 
+# TODO
+-  clarifiy difference/different inputs/outputs between scripts and functions 
  
 # Authors
 
