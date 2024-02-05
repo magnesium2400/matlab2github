@@ -1,6 +1,7 @@
 ---
 layout: default
 title: readFrontmatter
+checksum: 9aab75a688555fd52d50a2c51846f3eb
 parent: helpers
 ---
 

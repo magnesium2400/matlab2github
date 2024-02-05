@@ -1,4 +1,4 @@
-function outputfull = m2md(file, varargin)
+function [outputfull, docstringText] = m2md(file, varargin)
 %% m2md Convert MATLAB .m docstring/help to Markdown
 %% Syntax
 %  m2md(file)
@@ -54,6 +54,20 @@ function outputfull = m2md(file, varargin)
 % 
 % 
 %% %% Name-Value Arguments
+% `skipMatchingChecksum - Whether to skip re-running code if docstring and
+% output file are unchanged (true (default) | false)` By default, output
+% markdown files contain a hash of the docstring used to generate them. If
+% re-running this command and the target output file contains the same checksum
+% as the docstring of the MATLAB code file being analysed (_not the whole
+% file_), and `skipMatchingChecksum` is set to `true`, a new markdown file will
+% not be generated. This speeds up re-running code on existing codebases.
+% 
+% 
+% `addFrontmatter - Whether to add YAML-style frontmatter (true (default) |
+% false)` This adds YAML-style frontmatter that may aid in the use of templates
+% when creating webpages using GitHub pages.
+% 
+% 
 % `outputdir - Name of directory of converted file (string scalar | character
 % vector)`
 % 
@@ -76,10 +90,6 @@ function outputfull = m2md(file, varargin)
 % (default) | false)`
 % 
 % 
-% `addFrontmatter - Whether to add YAML-style frontmatter (true (default) |
-% false)`
-% 
-% 
 %% Output Arguments
 % `outputFilepath - name of converted file (string scalar | character vector)`
 % 
@@ -100,6 +110,7 @@ ip.addRequired('file', @(x) isStringScalar(x) || ischar(x));
 ip.addParameter('outputdir', '', @(x) isStringScalar(x) || ischar(x));
 ip.addParameter('outputfile', '', @(x) isStringScalar(x) || ischar(x));
 
+ip.addParameter('skipMatchingChecksum', true, @islogical);
 ip.addParameter('changeCode', true, @islogical);
 ip.addParameter('changeMonospace', true, @islogical);
 ip.addParameter('changeTitle', true, @islogical);
@@ -137,10 +148,21 @@ commentStart = find(commented, 1);
 commentEnd = find(~commented(commentStart:end),1)+commentStart-2;
 
 filetext = join(filetext(commentStart:commentEnd), newline);
+docstringText = filetext{1};
+
+
+%% Skip if text checksum is the same as in the outputfile frontmatter
+if ip.Results.skipMatchingChecksum && isfile(outputfull)
+    prev = readFrontmatter(outputfull);
+    if isfield(prev, 'checksum') && ...
+            strcmp(prev.checksum, mlreportgen.utils.hash(docstringText))
+        return;
+    end
+end
 
 
 %% Convert to mlx, open, export, close, and delete
-matlab.internal.liveeditor.openAsLiveCode(filetext{1});
+matlab.internal.liveeditor.openAsLiveCode(docstringText);
 activeDoc = matlab.desktop.editor.getActive();
 cleanupObj(1) = onCleanup(@() activeDoc.close()); % close .mlx window when completed or errrored 
 
@@ -182,7 +204,9 @@ out = tmp; clear tmp;
 writelines(out, outputfull);
 
 if ip.Results.addFrontmatter
-    writeFrontmatter(outputfull, struct('layout', 'default', 'title', name));
+    writeFrontmatter(outputfull, ...
+        struct('layout', 'default', 'title', name, ...
+        'checksum', mlreportgen.utils.hash(docstringText)));
 end
 
 

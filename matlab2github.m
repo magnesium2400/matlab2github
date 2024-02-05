@@ -59,10 +59,11 @@ for ii = 1:length(ms)
     fprintf("%i/%i: %s", ii, length(ms), n);
 
     try % continue to all files even if some errors occur
-        mdFile = m2md( fullfile(ms(ii).folder, ms(ii).name) , ...
+        [mdFile, docstring] = m2md( fullfile(ms(ii).folder, ms(ii).name) , ...
             'outputdir', of, 'addFrontmatter', false);
 
-        yaml = struct('layout', 'default', 'title', n);
+        yaml = struct('layout', 'default', 'title', n, ...
+            'checksum', mlreportgen.utils.hash(docstring));
         if isempty(s); writeFrontmatter(mdFile, yaml); fprintf(' done\n'); continue; end
 
         yaml.parent = s;

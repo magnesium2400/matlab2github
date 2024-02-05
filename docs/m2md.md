@@ -1,6 +1,7 @@
 ---
 layout: default
 title: m2md
+checksum: 588b78e239813562fa48c1a4c1dd5cc3
 ---
 
 
@@ -51,6 +52,12 @@ m2md('m2md.m', 'outputdir', 'docs')
  
 ## Name-Value Arguments
 
+`skipMatchingChecksum - Whether to skip re-running code if docstring and output file are unchanged (true (default) | false)` By default, output markdown files contain a hash of the docstring used to generate them. If re-running this command and the target output file contains the same checksum as the docstring of the MATLAB code file being analysed (*not the whole file*), and `skipMatchingChecksum` is set to `true`, a new markdown file will not be generated. This speeds up re-running code on existing codebases.
+
+
+`addFrontmatter - Whether to add YAML-style frontmatter (true (default) | false)` This adds YAML-style frontmatter that may aid in the use of templates when creating webpages using GitHub pages.
+
+
 `outputdir - Name of directory of converted file (string scalar | character vector)`
 
 
@@ -67,9 +74,6 @@ m2md('m2md.m', 'outputdir', 'docs')
 
 
 `changeMonospace - Whether to replace HTML pre tags from code (true (default) | false)`
-
-
-`addFrontmatter - Whether to add YAML-style frontmatter (true (default) | false)`
 
  
 # Output Arguments
