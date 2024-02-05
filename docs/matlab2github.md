@@ -1,7 +1,7 @@
 ---
 layout: default
 title: matlab2github
-checksum: 4337be34c4cafcce4fb53a71d36f1a4f
+checksum: 9c008af4967b27c60795bc80c9c18802
 ---
 
 
@@ -23,7 +23,6 @@ matlab2github(pwd, 'outputdir', 'help')
 -  docs 
 -  check recursion/multiple depths through folder structure 
 -  add functionality for contents incl MAKECONTENTSFILE 
--  add functionality to only redo conversion for changed files (perhaps by storing .m file checksum in .md file frontmatter) 
  
 # Authors
 

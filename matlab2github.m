@@ -15,7 +15,6 @@ function matlab2github(varargin)
 % * docs
 % * check recursion/multiple depths through folder structure
 % * add functionality for contents incl MAKECONTENTSFILE
-% * add functionality to only redo conversion for changed files (perhaps by storing .m file checksum in .md file frontmatter)
 %
 %
 %% Authors

@@ -71,6 +71,7 @@ function [outputfull, docstringText] = m2md(file, varargin)
 % `outputdir - Name of directory of converted file (string scalar | character
 % vector)`
 % 
+% 
 % `outputfile - Name of converted file (string scalar | character vector)`
 % 
 % 
@@ -92,6 +93,10 @@ function [outputfull, docstringText] = m2md(file, varargin)
 % 
 %% Output Arguments
 % `outputFilepath - name of converted file (string scalar | character vector)`
+% 
+% 
+%% TODO
+% * clarifiy difference/different inputs/outputs between scripts and functions
 % 
 % 
 %% Authors 
