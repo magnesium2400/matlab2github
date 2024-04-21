@@ -1,9 +1,33 @@
-function [out, idx] = readFrontmatter(filepath)
-%% READFRONTMATTER Read YAML-style frontmatter from document
+function [fm, idx] = readFrontmatter(filepath)
+%% READFRONTMATTER Read YAML-style frontmatter from file
+%% Syntax
+%  fm = readFrontmatter(filepath)
+%  [fm,idx] = readFrontmatter(filepath)
+% 
+% 
+%% Description
+% `fm = readFrontmatter(filepath)` reads YAML-style frontmatter from a text file
+% and returns it as a struct with the same key-value pairs.
+%  
+% `[fm,idx] = readFrontmatter(filepath)` also returns the positions of the start
+% and end of the YAML frontmatter.
+% 
+% 
 %% Examples
-%   addpath(genpath(fileparts(which('matlab2github')))); tmp = readFrontmatter(fullfile(fileparts(which('matlab2github')), 'docs', 'm2md.md'));
+%   addpath(genpath(fileparts(which('matlab2github')))); fm = readFrontmatter(fullfile(fileparts(which('matlab2github')), 'docs', 'm2md.md'))
 %
 %
+%% Input Arguments
+% `filepath - file path (character vector | string scalar)`
+% 
+% 
+%% Output Arguments
+% `fm - frontmatter (struct)`
+%
+% `idx - line numbers of start and end of frontmatter (2-element numeric
+% matrix)`
+% 
+% 
 %% Authors
 % Mehul Gajwani, Monash University, 2024
 %
@@ -13,7 +37,8 @@ function [out, idx] = readFrontmatter(filepath)
 %
 %
 
-out = struct(); idx = [1 1];
+
+fm = struct(); idx = [1 1];
 if ~isfile(filepath)
     warning('File not found');
     return;
@@ -41,7 +66,7 @@ end
 idx = [beg+1, fin-1];
 yaml = cellfun(@strtrim, split(file(idx(1):idx(2)),':'), 'UniformOutput', 0);
 if numel(yaml) == 2; yaml = reshape(yaml, 1, 2); end
-out = cell2struct(yaml(:,2), yaml(:,1), 1);
+fm = cell2struct(yaml(:,2), yaml(:,1), 1);
 
 
 end
